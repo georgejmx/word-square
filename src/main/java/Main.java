@@ -1,12 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main {
+    static final int MAX_SHUFFLES = 100;
+
+    static String INPUT_STR = "eeeeddoonnnsssrv";
+
     // Word square
     public static List<String> wordSquare = new ArrayList<>();
 
@@ -16,7 +17,16 @@ public class Main {
     /* Program entry point */
     public static void main(String[] args) {
         loadWords();
-        searchAllPermutations("eeeeddoonnnsssrv");
+
+        int shufflesCount = 0;
+        while (shufflesCount < MAX_SHUFFLES) {
+            searchAllPermutations(INPUT_STR);
+
+            // Shuffle input string and clear wordSquare before trying again
+            INPUT_STR = shuffle(INPUT_STR);
+            wordSquare = new ArrayList<>();
+            shufflesCount++;
+        }
         System.out.println(wordSquare);
     }
 
@@ -84,7 +94,19 @@ public class Main {
     private static void printAndReturn() {
         System.out.println("A valid word square is;");
         for (String s : wordSquare) System.out.print(s + '\n');
-        System.exit(1);
+        System.exit(0);
+    }
+
+    /* Shuffle string and start process again if not found word square */
+    public static String shuffle(String input) {
+        List<Character> characters = new ArrayList<>();
+        for (char c:input.toCharArray()) characters.add(c);
+        StringBuilder output = new StringBuilder(input.length());
+        while (characters.size() != 0) {
+            int randPicker = (int) (Math.random()*characters.size());
+            output.append(characters.remove(randPicker));
+        }
+        return output.toString();
     }
 
     /* Reading words into set */
