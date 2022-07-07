@@ -11,7 +11,7 @@ public class Main {
     // Word square
     public static List<String> wordSquare = new ArrayList<>();
 
-    // Potential winning characters
+    // Potential matching characters
     public static int[] selectedChars;
 
     // Used characters
@@ -21,6 +21,9 @@ public class Main {
 
     // Stores the set of all valid words
     public static Set<String> words = new HashSet<>();
+
+    // Stores whether we need to break after a successful entry
+    public static boolean toBreak = false;
 
     /* Program entry point */
     public static void main(String[] args) {
@@ -33,9 +36,11 @@ public class Main {
             // Shuffle input string and clear wordSquare before trying again
             INPUT_STR = shuffle(INPUT_STR);
             wordSquare = new ArrayList<>();
+            visited = new ArrayList<>(Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
             shufflesCount++;
         }
         System.out.println(wordSquare);
+        System.out.println(visited);
     }
 
     /* Find all 4 digit permutations from the given string */
@@ -52,10 +57,16 @@ public class Main {
                                             chars.charAt(i), chars.charAt(j), chars.charAt(k), chars.charAt(l)};
                                         selectedChars = new int[]{i, j, k, l};
                                         permute("", new String(pick));
+                                        if (toBreak) break;
                                     }
                                 }
                             }
+                            if (toBreak) break;
                         }
+                    }
+                    if (toBreak) {
+                        toBreak = false;
+                        break;
                     }
                 }
             }
@@ -84,15 +95,18 @@ public class Main {
         if (wordSquare.size() == 0) {
             wordSquare.add(str);
             updateVisited();
+            System.out.println(visited);
         } else if (wordSquare.size() == 1) {
             if (str.charAt(0) == wordSquare.get(0).charAt(1)) {
                 wordSquare.add(str);
                 updateVisited();
+                System.out.println(visited);
             }
         } else if (wordSquare.size() == 2) {
             if (str.charAt(0) == wordSquare.get(0).charAt(2) && str.charAt(1) == wordSquare.get(1).charAt(2)) {
                 wordSquare.add(str);
                 updateVisited();
+                System.out.println(visited);
             }
         } else {
             // We are one word away from a complete square
@@ -111,6 +125,7 @@ public class Main {
         visited.get(1).add(selectedChars[1]);
         visited.get(2).add(selectedChars[2]);
         visited.get(3).add(selectedChars[3]);
+        toBreak = true;
     }
 
     /* Prints the valid word square then exits program */
