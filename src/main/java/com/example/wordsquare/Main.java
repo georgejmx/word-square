@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Main {
-    static final int MAX_SHUFFLES = 100;
+    static final int MAX_SHUFFLES = 1000;
 
     static String INPUT_STR = "eeeeddoonnnsssrv";
 
@@ -31,6 +31,7 @@ public class Main {
     public static void main(String[] args) {
         loadWords();
 
+        // If don't find word square then shuffle all. Ideally this would be a last resort
         int shufflesCount = 0;
         while (shufflesCount < MAX_SHUFFLES) {
             searchAllPermutations(INPUT_STR);
@@ -38,14 +39,17 @@ public class Main {
             // Shuffle input string and clear wordSquare before trying again
             INPUT_STR = shuffle(INPUT_STR);
             wordSquare = new ArrayList<>();
-            visited = new ArrayList<>(Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
+            visited = new ArrayList<>(Arrays.asList(
+                    new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>()));
             shufflesCount++;
         }
         System.out.println(wordSquare);
         System.out.println(visited);
     }
 
-    /* Find all 4 digit permutations from the given string */
+    /* Find all 4 digit permutations from the given string. Uses the cartesian product with N nested for loop.
+     * This could either be replaced by an off the shelf Cartesian product function of could make a manual one to
+     * avoid the bad nested loops */
     private static void searchAllPermutations(String chars) {
         for (int i = 0; i < chars.length(); i++) {
             if (!visited.get(0).contains(i)) {
@@ -75,7 +79,7 @@ public class Main {
         }
     }
 
-    /* Boilerplate code for finding all permutations of a given substring */
+    /* Finding all permutations of a given substring that is of length the word square */
     private static void permute(String prefix, String str) {
         int n = str.length();
         if (n == 0) {
@@ -92,24 +96,20 @@ public class Main {
         // If this string is not a word or if already in word square, early return
         if (!words.contains(str)) return;
         if (wordSquare.contains(str)) return;
-        if (!isWordSquareFit(str)) return;
 
         // Checking existing words
         if (wordSquare.size() == 0) {
             wordSquare.add(str);
             updateVisited();
-            System.out.println(visited);
         } else if (wordSquare.size() == 1) {
             if (str.charAt(0) == wordSquare.get(0).charAt(1)) {
                 wordSquare.add(str);
                 updateVisited();
-                System.out.println(visited);
             }
         } else if (wordSquare.size() == 2) {
             if (str.charAt(0) == wordSquare.get(0).charAt(2) && str.charAt(1) == wordSquare.get(1).charAt(2)) {
                 wordSquare.add(str);
                 updateVisited();
-                System.out.println(visited);
             }
         } else {
             // We are one word away from a complete square
@@ -164,23 +164,5 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /* Determining if the proposed word will fit in the square */
-    public static boolean isWordSquareFit(String word) {
-        // Concatenating the proposed word with word square
-        String charsSoFar = word;
-        String reducedInput = INPUT_STR;
-        for (String sWord : wordSquare) charsSoFar = charsSoFar.concat(sWord);
-
-        // Removing all characters from input string that we have.
-        int i = 0;
-        while (i < charsSoFar.length()) {
-            String current = String.valueOf(charsSoFar.charAt(i));
-            if (!reducedInput.contains(current)) return false;
-            reducedInput = reducedInput.replaceFirst(current, "");
-            i++;
-        }
-        return true;
     }
 }
