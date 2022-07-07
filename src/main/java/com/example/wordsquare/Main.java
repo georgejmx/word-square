@@ -1,3 +1,5 @@
+package com.example.wordsquare;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +11,7 @@ public class Main {
     static String INPUT_STR = "eeeeddoonnnsssrv";
 
     // Word square
-    public static List<String> wordSquare = new ArrayList<>();
+    public static ArrayList<String> wordSquare = new ArrayList<>();
 
     // Potential matching characters
     public static int[] selectedChars;
@@ -90,6 +92,7 @@ public class Main {
         // If this string is not a word or if already in word square, early return
         if (!words.contains(str)) return;
         if (wordSquare.contains(str)) return;
+        if (!isWordSquareFit(str)) return;
 
         // Checking existing words
         if (wordSquare.size() == 0) {
@@ -161,5 +164,23 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /* Determining if the proposed word will fit in the square */
+    public static boolean isWordSquareFit(String word) {
+        // Concatenating the proposed word with word square
+        String charsSoFar = word;
+        String reducedInput = INPUT_STR;
+        for (String sWord : wordSquare) charsSoFar = charsSoFar.concat(sWord);
+
+        // Removing all characters from input string that we have.
+        int i = 0;
+        while (i < charsSoFar.length()) {
+            String current = String.valueOf(charsSoFar.charAt(i));
+            if (!reducedInput.contains(current)) return false;
+            reducedInput = reducedInput.replaceFirst(current, "");
+            i++;
+        }
+        return true;
     }
 }
