@@ -11,6 +11,14 @@ public class Main {
     // Word square
     public static List<String> wordSquare = new ArrayList<>();
 
+    // Potential winning characters
+    public static int[] selectedChars;
+
+    // Used characters
+    public static ArrayList<Set<Integer>> visited = new ArrayList<>(
+        Arrays.asList(new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashSet<>())
+    );
+
     // Stores the set of all valid words
     public static Set<String> words = new HashSet<>();
 
@@ -33,14 +41,18 @@ public class Main {
     /* Find all 4 digit permutations from the given string */
     private static void searchAllPermutations(String chars) {
         for (int i = 0; i < chars.length(); i++) {
-            for (int j = 0; j < chars.length(); j++) {
-                if (j != i) {
-                    for (int k = 0; k < chars.length(); k++) {
-                        if (k != j) {
-                            for (int l = 0; l < chars.length(); l++) {
-                                if (l != k) {
-                                    char[] pick = {chars.charAt(i), chars.charAt(j), chars.charAt(k), chars.charAt(l)};
-                                    permute( "", new String(pick));
+            if (!visited.get(0).contains(i)) {
+                for (int j = 0; j < chars.length(); j++) {
+                    if (j != i && !visited.get(1).contains(j)) {
+                        for (int k = 0; k < chars.length(); k++) {
+                            if (k != j && !visited.get(2).contains(k)) {
+                                for (int l = 0; l < chars.length(); l++) {
+                                    if (l != k && !visited.get(3).contains(l)) {
+                                        char[] pick = {
+                                            chars.charAt(i), chars.charAt(j), chars.charAt(k), chars.charAt(l)};
+                                        selectedChars = new int[]{i, j, k, l};
+                                        permute("", new String(pick));
+                                    }
                                 }
                             }
                         }
@@ -71,13 +83,16 @@ public class Main {
         // Checking existing words
         if (wordSquare.size() == 0) {
             wordSquare.add(str);
+            updateVisited();
         } else if (wordSquare.size() == 1) {
             if (str.charAt(0) == wordSquare.get(0).charAt(1)) {
                 wordSquare.add(str);
+                updateVisited();
             }
         } else if (wordSquare.size() == 2) {
             if (str.charAt(0) == wordSquare.get(0).charAt(2) && str.charAt(1) == wordSquare.get(1).charAt(2)) {
                 wordSquare.add(str);
+                updateVisited();
             }
         } else {
             // We are one word away from a complete square
@@ -88,6 +103,14 @@ public class Main {
                 printAndReturn();
             }
         }
+    }
+
+    /* Updates visited characters */
+    private static void updateVisited() {
+        visited.get(0).add(selectedChars[0]);
+        visited.get(1).add(selectedChars[1]);
+        visited.get(2).add(selectedChars[2]);
+        visited.get(3).add(selectedChars[3]);
     }
 
     /* Prints the valid word square then exits program */
